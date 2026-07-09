@@ -1,0 +1,17 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Future backend (Node) — uncomment/expand once a server is added
+# node_modules/
+# .env
+# dist/
+# build/
+
+# Logs
+*.log
