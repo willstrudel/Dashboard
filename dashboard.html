@@ -3,10 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
 <title>Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23171b21'/%3E%3Cpath d='M32 12 L48 32 L32 52 L16 32 Z' fill='none' stroke='%236ee7b7' stroke-width='4'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
   :root{
     --bg:#0f1216;
@@ -18,6 +22,10 @@
     --text-faint:#565e6b;
     --accent:#6ee7b7;
     --accent-dim:#3a5f52;
+    --accent-rgb:110,231,183;
+    --lavender:#c4b5fd;
+    --lavender-rgb:196,181,253;
+    --lavender-dim:#453a63;
     --amber:#f2b84b;
     --danger:#ef6b6b;
     --radius:10px;
@@ -51,18 +59,18 @@
     letter-spacing:2px;
     color:var(--text-faint);
     text-transform:uppercase;
-  }
-  .brand b{color:var(--accent);}
-  #greeting{font-size:20px;font-weight:600;margin-top:4px;}
-  .status{
-    font-family:'JetBrains Mono',monospace;
-    font-size:12px;
-    color:var(--text-faint);
     display:flex;
     align-items:center;
     gap:8px;
   }
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2.4s ease-in-out infinite;}
+  #greeting{font-size:20px;font-weight:600;margin-top:4px;}
+  .topbar-link{
+    background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text-dim);
+    border-radius:8px;padding:8px 14px;font-size:13px;text-decoration:none;
+    font-family:'JetBrains Mono',monospace;letter-spacing:.5px;
+  }
+  .topbar-link:hover{border-color:var(--lavender);color:var(--lavender);}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2.4s ease-in-out infinite;flex-shrink:0;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
 
   /* grid */
@@ -78,6 +86,7 @@
     padding:20px;
     position:relative;
     overflow:hidden;
+    isolation:isolate;
   }
   .panel h2{
     font-family:'JetBrains Mono',monospace;
@@ -91,6 +100,15 @@
     justify-content:space-between;
   }
   .panel h2 .tag{color:var(--text-faint);font-weight:400;letter-spacing:1px;}
+  .clock-panel::before{
+    content:'';
+    position:absolute;
+    z-index:-1;
+    top:-50px;right:-50px;
+    width:160px;height:160px;
+    background:radial-gradient(circle, rgba(var(--lavender-rgb),0.34), transparent 70%);
+    pointer-events:none;
+  }
 
   .col-3{grid-column:span 3;}
   .col-4{grid-column:span 4;}
@@ -131,10 +149,11 @@
     line-height:1;
     text-shadow:0 0 24px rgba(110,231,183,0.25);
   }
-  #clock .secs{color:var(--text-dim);font-size:28px;}
+  #clock .secs{color:var(--lavender);font-size:28px;}
   #dateline{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text-dim);margin-top:10px;}
 
   /* weather */
+  #wx-body{min-height:140px;}
   .wx-now{display:flex;align-items:baseline;gap:14px;margin-bottom:16px;}
   .wx-temp{font-family:'JetBrains Mono',monospace;font-size:44px;font-weight:600;}
   .wx-desc{color:var(--text-dim);font-size:13px;}
@@ -148,10 +167,117 @@
     padding:10px 6px;
     text-align:center;
   }
+  .wx-day.is-today{border-color:var(--accent);}
   .wx-day .d{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:6px;}
   .wx-day .hi{font-weight:600;font-size:14px;}
-  .wx-day .lo{color:var(--text-faint);font-size:12px;}
+  .wx-day .lo{color:var(--lavender);font-size:12px;}
   .wx-err{color:var(--danger);font-size:13px;}
+  .wx-head-controls{display:flex;align-items:center;gap:8px;}
+  .wx-select{
+    background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text-dim);
+    border-radius:6px;padding:3px 6px;font-size:11px;font-family:'JetBrains Mono',monospace;
+    letter-spacing:.5px;cursor:pointer;color-scheme:dark;
+  }
+  .wx-select:hover,.wx-select:focus{border-color:var(--accent);color:var(--text);outline:none;}
+  .wx-select option{background:var(--panel-2);color:var(--text);}
+  .wx-alert{
+    display:flex;align-items:flex-start;gap:10px;background:rgba(239,107,107,0.08);
+    border:1px solid rgba(239,107,107,0.4);border-radius:8px;padding:10px 12px;margin-bottom:14px;
+    font-size:12.5px;line-height:1.5;
+  }
+  .wx-alert.severity-moderate{background:rgba(242,184,75,0.08);border-color:rgba(242,184,75,0.4);}
+  .wx-alert .wx-alert-body{flex:1;}
+  .wx-alert .wx-alert-title{font-weight:600;color:var(--danger);margin-bottom:2px;}
+  .wx-alert.severity-moderate .wx-alert-title{color:var(--amber);}
+  .wx-alert .wx-alert-close{cursor:pointer;color:var(--text-faint);flex-shrink:0;}
+  .wx-alert .wx-alert-close:hover{color:var(--text);}
+  .wx-day{cursor:pointer;transition:border-color .15s;}
+  .wx-day:hover{border-color:var(--lavender);}
+
+  /* generic modal (weather hourly detail) */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(6,8,11,0.72);backdrop-filter:blur(2px);
+    display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal-backdrop.hidden{display:none;}
+  .modal{
+    background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--border);
+    border-radius:var(--radius);padding:22px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto;
+  }
+  #wx-modal-backdrop .modal{max-width:600px;}
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .modal-head h3{margin:0;font-size:15px;font-weight:600;}
+  .modal-close{background:none;border:none;color:var(--text-faint);font-size:18px;cursor:pointer;line-height:1;}
+  .modal-close:hover{color:var(--text);}
+  .hourly-strip{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;margin:0 -4px;}
+  .hourly-col{
+    display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;
+    width:62px;padding:10px 4px;border-radius:8px;border:1px solid transparent;
+  }
+  .hourly-col:hover{background:rgba(255,255,255,0.03);}
+  .hourly-col.current{background:rgba(var(--accent-rgb),0.14);border-color:var(--accent);}
+  .hourly-col.current .hr-time{color:var(--accent);font-weight:700;}
+  .hourly-col .hr-time{color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:11px;}
+  .hourly-col .hr-icon{width:26px;height:26px;color:var(--text-dim);}
+  .hourly-col .hr-icon.wx-rain{color:var(--lavender);}
+  .hourly-col .hr-icon.wx-storm{color:var(--amber);}
+  .hourly-col .hr-icon.wx-sun{color:var(--accent);}
+  .hourly-col .hr-temp{font-weight:600;font-family:'JetBrains Mono',monospace;font-size:13px;}
+  .hourly-col .hr-precip{color:var(--lavender);font-size:10.5px;}
+  .hourly-col .hr-wind{display:flex;align-items:center;gap:3px;color:var(--text-faint);font-size:10px;font-family:'JetBrains Mono',monospace;}
+  .hourly-col .hr-wind svg{width:11px;height:11px;}
+
+  /* calendar sync modal (form) */
+  .sync-label{display:block;font-size:11px;color:var(--text-faint);margin:14px 0 5px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;text-transform:uppercase;}
+  .sync-label:first-of-type{margin-top:0;}
+  .sync-input{
+    width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);
+    color:var(--text);border-radius:6px;padding:8px 10px;font-size:13px;font-family:inherit;
+  }
+  .sync-input:focus{outline:none;border-color:var(--accent);}
+  textarea.sync-input{resize:vertical;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.5;}
+  .sync-help{font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-top:14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+  .sync-help b{color:var(--text);}
+  .sync-error{color:var(--danger);font-size:12px;margin-top:10px;min-height:14px;}
+  .sync-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+  .sync-actions button{border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .sync-cancel{background:none;border:1px solid var(--border);color:var(--text-dim);}
+  .sync-cancel:hover{border-color:var(--text-dim);color:var(--text);}
+  .sync-save{background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);}
+  .sync-save:hover{background:var(--accent);color:var(--bg);}
+  .sync-section-title{font-size:11px;color:var(--text-faint);margin:0 0 8px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;text-transform:uppercase;}
+  .sync-connected{display:flex;flex-direction:column;gap:7px;}
+  .sync-connected-empty{font-size:12px;color:var(--text-faint);}
+  .sync-connected-item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;padding:8px 10px;}
+  .sync-connected-info{min-width:0;}
+  .sync-connected-label{font-size:13px;color:var(--text);}
+  .sync-connected-url{font-size:10.5px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
+  .sync-remove-btn{background:none;border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;flex-shrink:0;}
+  .sync-remove-btn:hover{border-color:var(--danger);color:var(--danger);}
+  .sync-remove-btn:disabled{opacity:.5;cursor:default;}
+
+  /* bluetooth battery */
+  .bt-list{list-style:none;margin:0;padding:0;}
+  .bt-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .bt-item:last-child{border-bottom:none;}
+  .bt-item .bt-name{flex:1;font-size:13px;}
+  .bt-item .bt-name.offline{color:var(--text-faint);}
+  .bt-bar{width:70px;height:6px;border-radius:3px;background:rgba(255,255,255,0.06);overflow:hidden;flex-shrink:0;}
+  .bt-bar-fill{height:100%;border-radius:3px;background:var(--accent);}
+  .bt-bar-fill.low{background:var(--danger);}
+  .bt-bar-fill.mid{background:var(--amber);}
+  .bt-pct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--lavender);width:34px;text-align:right;flex-shrink:0;}
+  .bt-updated{font-size:11px;color:var(--text-faint);margin-top:10px;font-family:'JetBrains Mono',monospace;}
+  .bt-head-right{display:flex;align-items:center;gap:8px;}
+  .bt-poll-btn{
+    background:none;border:1px solid var(--border);color:var(--text-dim);
+    width:22px;height:22px;border-radius:6px;cursor:pointer;font-size:13px;
+    display:flex;align-items:center;justify-content:center;line-height:1;padding:0;
+  }
+  .bt-poll-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .bt-poll-btn:disabled{opacity:.5;cursor:default;}
+  .bt-poll-btn.spinning{animation:bt-spin .8s linear infinite;}
+  @keyframes bt-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
   /* calendar */
   .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
@@ -167,6 +293,7 @@
     aspect-ratio:1;
     border-radius:6px;
     background:rgba(255,255,255,0.02);
+    border:1px solid var(--lavender);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -176,19 +303,40 @@
     position:relative;
     color:var(--text-dim);
   }
-  .cal-cell:hover{background:rgba(255,255,255,0.06);}
-  .cal-cell.empty{cursor:default;background:transparent;}
-  .cal-cell.today{color:var(--bg);background:var(--accent);font-weight:700;}
-  .cal-cell .ev-dot{width:4px;height:4px;border-radius:50%;background:var(--amber);position:absolute;bottom:5px;}
+  .cal-cell:hover{background:rgba(var(--lavender-rgb),0.14);color:var(--lavender);}
+  .cal-cell.empty{cursor:default;background:transparent;border-color:transparent;}
+  .cal-cell.empty:hover{background:transparent;color:var(--text-dim);}
+  .cal-cell.today{color:var(--bg);background:var(--accent);border-color:var(--accent);font-weight:700;}
+  .cal-cell .ev-dots{position:absolute;bottom:5px;display:flex;gap:3px;}
+  .cal-cell .ev-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);}
+  .cal-cell .ev-dot.synced{background:var(--accent);}
   .cal-cell.today .ev-dot{background:var(--bg);}
   .cal-events{margin-top:14px;border-top:1px solid var(--border);padding-top:12px;}
-  .cal-events-title{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-faint);margin-bottom:8px;letter-spacing:1px;}
+  .cal-events-title{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:8px;letter-spacing:1px;}
   .ev-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px dashed var(--border);}
   .ev-item:last-child{border-bottom:none;}
   .ev-item .ev-when{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:8px;}
+  .ev-item .ev-src{font-size:9px;color:var(--lavender);border:1px solid var(--lavender-dim);border-radius:3px;padding:1px 4px;margin-left:6px;letter-spacing:.5px;}
   .ev-item .rm{color:var(--text-faint);cursor:pointer;font-size:13px;}
   .ev-item .rm:hover{color:var(--danger);}
   .cal-sync-note{font-size:11px;color:var(--text-faint);margin-top:10px;line-height:1.5;}
+  .cal-head-controls{display:flex;align-items:center;gap:6px;}
+  .cal-sync-btn{
+    background:none;border:1px solid var(--border);color:var(--text-dim);
+    border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;
+    letter-spacing:.5px;
+  }
+  .cal-sync-btn:hover{border-color:var(--lavender);color:var(--lavender);}
+
+  /* calendar filter modal */
+  .filter-mode{display:flex;flex-direction:column;gap:10px;}
+  .filter-radio{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer;}
+  .filter-radio input{accent-color:var(--lavender);width:15px;height:15px;flex-shrink:0;}
+  .filter-list{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:9px;transition:opacity .15s;}
+  .filter-list.disabled{opacity:.4;pointer-events:none;}
+  .filter-check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
+  .filter-check input{accent-color:var(--lavender);width:15px;height:15px;flex-shrink:0;}
+  .filter-empty{font-size:12px;color:var(--text-faint);}
 
   /* generic list panels: projects, hobbies, shortcuts */
   .add-row{display:flex;gap:6px;margin-bottom:12px;}
@@ -209,7 +357,7 @@
   }
   ul.list li:last-child{border-bottom:none;}
   ul.list li.done span.txt{text-decoration:line-through;color:var(--text-faint);}
-  ul.list li input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;}
+  ul.list li input[type=checkbox]{accent-color:var(--lavender);width:15px;height:15px;flex-shrink:0;}
   ul.list li .txt{flex:1;word-break:break-word;}
   ul.list li .rm{color:var(--text-faint);cursor:pointer;flex-shrink:0;}
   ul.list li .rm:hover{color:var(--danger);}
@@ -217,6 +365,7 @@
 
   /* hobby tags */
   .tags{display:flex;flex-wrap:wrap;gap:8px;}
+  .tags .tag{border-color:rgba(var(--lavender-rgb),0.4);}
   .tag{
     background:rgba(255,255,255,0.03);border:1px solid var(--border);
     padding:6px 12px;border-radius:20px;font-size:12.5px;display:flex;align-items:center;gap:8px;
@@ -224,16 +373,37 @@
   .tag .rm{color:var(--text-faint);cursor:pointer;}
   .tag .rm:hover{color:var(--danger);}
 
+  /* bluetooth + shortcuts stack (shares a column, together matching the calendar's height) */
+  .panel-stack{display:flex;flex-direction:column;gap:18px;}
+  .panel-stack .panel{flex:0 0 auto;}
+  .panel-stack .panel.grow{flex:1 1 auto;}
+
+  @media (max-width:980px){
+    /* single-column stacking: pull Bluetooth out of its Shortcuts wrapper so it can
+       sit above Weather, under the clock, while everything else keeps its order */
+    .panel-stack{display:contents;}
+    .clock-panel{order:1;}
+    .panel-bluetooth{order:2;}
+    #wx-panel{order:3;}
+    .panel-calendar{order:4;}
+    .panel-shortcuts{order:5;}
+    .panel-hobbies{order:6;}
+    .panel-notes{order:7;}
+    .panel-projects{order:8;}
+  }
+
   /* shortcuts */
   .shortcut-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .shortcut{
     background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;
     padding:10px 12px;display:flex;justify-content:space-between;align-items:center;
-    text-decoration:none;color:var(--text);font-size:13px;
+    text-decoration:none;color:var(--text);font-size:13px;cursor:grab;
   }
-  .shortcut:hover{border-color:var(--accent);color:var(--accent);}
+  .shortcut:hover{border-color:var(--lavender);color:var(--lavender);}
   .shortcut .rm{color:var(--text-faint);}
   .shortcut .rm:hover{color:var(--danger);}
+  .shortcut.dragging{opacity:0.35;cursor:grabbing;}
+  .shortcut.drag-over{border-color:var(--accent);background:rgba(110,231,183,0.06);}
   .shortcut-add{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
   .shortcut-add .row2{display:flex;gap:6px;}
 
@@ -244,12 +414,16 @@
     padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;
     resize:vertical;line-height:1.6;
   }
-  textarea#notes:focus{outline:none;border-color:var(--accent);}
+  textarea#notes:focus{outline:none;border-color:var(--lavender);}
   .save-state{font-size:11px;color:var(--text-faint);margin-top:8px;font-family:'JetBrains Mono',monospace;}
 
   footer{
     text-align:center;color:var(--text-faint);font-size:11px;font-family:'JetBrains Mono',monospace;
     margin-top:26px;letter-spacing:1px;
+  }
+  .footer-dot{
+    display:inline-block;width:4px;height:4px;border-radius:50%;
+    background:var(--lavender);margin:0 6px;vertical-align:middle;
   }
 </style>
 </head>
@@ -258,10 +432,10 @@
 
   <div class="topbar">
     <div>
-      <div class="brand"><b>◆</b> personal / dashboard</div>
+      <div class="brand"><span class="dot"></span> personal dashboard</div>
       <div id="greeting"></div>
     </div>
-    <div class="status"><span class="dot"></span><span id="statusline">local build · saved to this browser</span></div>
+    <a href="library.html" class="topbar-link">Library</a>
   </div>
 
   <div class="grid">
@@ -275,15 +449,19 @@
 
     <!-- Weather -->
     <div class="panel col-8" id="wx-panel">
-      <h2>Weather <span class="tag" id="wx-loc-tag">Roswell, GA</span></h2>
+      <h2>Weather <span class="wx-head-controls"><select id="wx-city" class="wx-select"></select></span></h2>
+      <div id="wx-alerts"></div>
       <div id="wx-body">
         <div class="wx-err">Loading forecast…</div>
       </div>
     </div>
 
     <!-- Calendar -->
-    <div class="panel col-7">
-      <h2>Calendar</h2>
+    <div class="panel col-7 panel-calendar">
+      <h2>Calendar <span class="cal-head-controls">
+        <button class="cal-sync-btn" id="cal-filter-btn" title="Choose which synced calendars are shown">👁 Filter</button>
+        <button class="cal-sync-btn" id="cal-sync-btn" title="Connect an iCloud, Google, or other ICS calendar feed">⚙ Sync calendars</button>
+      </span></h2>
       <div class="cal-head">
         <div class="cal-nav"><button id="cal-prev">‹</button></div>
         <div class="month" id="cal-month">-</div>
@@ -295,21 +473,36 @@
         <div class="cal-events-title">UPCOMING</div>
         <div id="cal-events-list"></div>
       </div>
-      <div class="cal-sync-note">Click a day to add an event. This calendar is separate from your iPhone calendar for now — no live iCloud/Google sync in a single static file (browsers block that without a backend). When this becomes a hosted site, we can pull your iPhone calendar in via a Google Calendar feed or CalDAV.</div>
+      <div class="cal-sync-note" id="cal-sync-note">Click a day to add an event.</div>
     </div>
 
-    <!-- Projects -->
-    <div class="panel col-5">
-      <h2>Projects</h2>
-      <div class="add-row">
-        <input id="proj-input" placeholder="Add a project…" maxlength="80">
-        <button id="proj-add">+</button>
+    <!-- Bluetooth battery + Shortcuts, stacked to fill the calendar's row height -->
+    <div class="col-5 panel-stack">
+      <div class="panel col-5 panel-bluetooth">
+        <h2>Bluetooth <span class="bt-head-right"><span class="tag" id="bt-tag">—</span><button id="bt-poll" class="bt-poll-btn" title="Poll Bluetooth now">⟳</button></span></h2>
+        <ul class="bt-list" id="bt-list">
+          <li class="empty-hint" style="border:none;">Loading…</li>
+        </ul>
+        <div class="bt-updated" id="bt-updated"></div>
       </div>
-      <ul class="list" id="proj-list"></ul>
+
+      <div class="panel col-5 grow panel-shortcuts">
+        <h2>Shortcuts</h2>
+        <div class="shortcut-grid">
+          <div class="shortcut-add">
+            <input id="sc-name" placeholder="Label (e.g. Homelab Wiki)" style="background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;">
+            <div class="row2">
+              <input id="sc-url" placeholder="URL or local path (https://… or file://…)" style="flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;">
+              <button id="sc-add" style="background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:0 14px;cursor:pointer;">+</button>
+            </div>
+          </div>
+          <div id="sc-grid" style="display:contents;"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Hobbies -->
-    <div class="panel col-5">
+    <div class="panel col-5 panel-hobbies">
       <h2>Hobbies</h2>
       <div class="add-row">
         <input id="hobby-input" placeholder="Add a hobby…" maxlength="40">
@@ -318,31 +511,89 @@
       <div class="tags" id="hobby-tags"></div>
     </div>
 
-    <!-- Shortcuts -->
-    <div class="panel col-7">
-      <h2>Shortcuts</h2>
-      <div class="shortcut-grid">
-        <div class="shortcut-add">
-          <input id="sc-name" placeholder="Label (e.g. Homelab Wiki)" style="background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;">
-          <div class="row2">
-            <input id="sc-url" placeholder="URL or local path (https://… or file://…)" style="flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 9px;font-size:13px;font-family:inherit;">
-            <button id="sc-add" style="background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:0 14px;cursor:pointer;">+</button>
-          </div>
-        </div>
-        <div id="sc-grid" style="display:contents;"></div>
-      </div>
-    </div>
-
     <!-- Notes -->
-    <div class="panel col-5">
+    <div class="panel col-7 panel-notes">
       <h2>Notes</h2>
       <textarea id="notes" placeholder="Jot something down… autosaves as you type."></textarea>
       <div class="save-state" id="notes-state">not saved yet</div>
     </div>
 
+    <!-- Projects -->
+    <div class="panel col-12 panel-projects">
+      <h2>Projects</h2>
+      <div class="add-row">
+        <input id="proj-input" placeholder="Add a project…" maxlength="80">
+        <button id="proj-add">+</button>
+      </div>
+      <ul class="list" id="proj-list"></ul>
+    </div>
+
   </div>
 
-  <footer>DASHBOARD · runs entirely in this browser · data stored locally on this device</footer>
+  <footer>Novachrono Dashboard <span class="footer-dot"></span> Data stored locally <span class="footer-dot"></span> Co-created with MAGI</footer>
+</div>
+
+<div class="modal-backdrop hidden" id="wx-modal-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="wx-modal-title">Hourly forecast</h3>
+      <button class="modal-close" id="wx-modal-close">✕</button>
+    </div>
+    <div id="wx-modal-body"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="cal-sync-modal-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Sync a calendar</h3>
+      <button class="modal-close" id="cal-sync-modal-close">✕</button>
+    </div>
+    <div class="sync-section-title">Connected calendars</div>
+    <div class="sync-connected" id="cal-sync-connected"></div>
+    <div class="sync-section-title" style="margin-top:18px;">Add a calendar</div>
+    <label class="sync-label" for="cal-sync-label">Label</label>
+    <input id="cal-sync-label" class="sync-input" placeholder="e.g. iCloud or Gmail" maxlength="30">
+    <label class="sync-label" for="cal-sync-url">ICS feed link</label>
+    <textarea id="cal-sync-url" class="sync-input" rows="3" placeholder="webcal://... or https://calendar.google.com/.../basic.ics"></textarea>
+    <div class="sync-help">
+      <b>iCloud:</b> Calendar app → tap the calendar name → Share Link → turn on Public Calendar → Copy Link<br><br>
+      <b>Google:</b> calendar.google.com → Settings → pick the calendar → Integrate calendar → "Secret address in iCal format" (treat this link like a password — don't share it)
+    </div>
+    <div class="sync-error" id="cal-sync-error"></div>
+    <div class="sync-actions">
+      <button class="sync-cancel" id="cal-sync-cancel">Cancel</button>
+      <button class="sync-save" id="cal-sync-save">Connect</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="cal-filter-modal-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Filter calendars</h3>
+      <button class="modal-close" id="cal-filter-modal-close">✕</button>
+    </div>
+    <div class="filter-mode">
+      <label class="filter-radio"><input type="radio" name="cal-filter-mode" value="all"> All calendars</label>
+      <label class="filter-radio"><input type="radio" name="cal-filter-mode" value="custom"> Select calendars</label>
+    </div>
+    <div class="filter-list" id="cal-filter-list"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop hidden" id="day-modal-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="day-modal-title">Day</h3>
+      <button class="modal-close" id="day-modal-close">✕</button>
+    </div>
+    <div id="day-modal-events"></div>
+    <div class="add-row" style="margin-top:14px;margin-bottom:0;">
+      <input id="day-add-input" placeholder="Add an event…" maxlength="120">
+      <button id="day-add-btn">+</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -352,19 +603,29 @@ const store = {
   set(k, v){ localStorage.setItem('dash:'+k, JSON.stringify(v)); }
 };
 
-/* ---------- greeting ---------- */
-(function greeting(){
-  const h = new Date().getHours();
-  const g = h<5?'Still up?':h<12?'Good morning.':h<17?'Good afternoon.':h<22?'Good evening.':'Still up?';
-  document.getElementById('greeting').textContent = g;
-})();
+/* ---------- greeting (boundaries in Eastern time, matching the clock) ---------- */
+function greetingText(){
+  const parts = new Intl.DateTimeFormat('en-US',{
+    timeZone:'America/New_York', hour12:false, hour:'2-digit', minute:'2-digit'
+  }).formatToParts(new Date()).reduce((a,p)=>(a[p.type]=p.value,a),{});
+  const mins = parseInt(parts.hour,10)*60 + parseInt(parts.minute,10);
+  if(mins < 12*60) return 'Good morning, Will.';       // 12:00am - 11:59am
+  if(mins <= 17*60) return 'Good afternoon, Will.';    // 12:00pm - 5:00pm
+  if(mins < 22*60) return 'Good evening, Will.';       // 5:01pm - 9:59pm
+  return 'Good night, Will.';                          // 10:00pm - 11:59pm
+}
+function updateGreeting(){
+  document.getElementById('greeting').textContent = greetingText();
+}
+updateGreeting();
+setInterval(updateGreeting, 30000);
 
 /* ---------- clock (EST/EDT via IANA tz, no manual offset math) ---------- */
 function tickClock(){
   const now = new Date();
   const parts = new Intl.DateTimeFormat('en-US',{
     timeZone:'America/New_York', hour12:true,
-    hour:'2-digit', minute:'2-digit', second:'2-digit'
+    hour:'numeric', minute:'2-digit', second:'2-digit'
   }).formatToParts(now).reduce((a,p)=>(a[p.type]=p.value,a),{});
   document.getElementById('clock').innerHTML =
     `${parts.hour}:${parts.minute}<span class="secs">:${parts.second} ${parts.dayPeriod}</span>`;
@@ -375,8 +636,12 @@ function tickClock(){
 }
 tickClock(); setInterval(tickClock,1000);
 
-/* ---------- weather (Open-Meteo, no API key, Roswell GA) ---------- */
-const WX_LAT = 34.0232, WX_LON = -84.3616;
+/* ---------- weather (Open-Meteo forecast, no API key) + NWS severe alerts ---------- */
+const WX_CITIES = {
+  roswell:     { label:'Roswell, GA',     lat:34.0232, lon:-84.3616 },
+  summerville: { label:'Summerville, GA', lat:34.4859, lon:-85.3435 },
+  duluth:      { label:'Duluth, GA',      lat:34.0029, lon:-84.1446 }
+};
 const WMO = { // simplified weather code -> description
   0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',
   45:'Fog',48:'Fog',
@@ -386,24 +651,57 @@ const WMO = { // simplified weather code -> description
   80:'Rain showers',81:'Rain showers',82:'Violent showers',
   95:'Thunderstorms',96:'Thunderstorms',99:'Thunderstorms'
 };
+let wxHourlyByDate = {}; // date key -> hourly readings, populated on each load, read by the click-through modal
+let wxLoadedOnce = false; // once true, background refreshes swap content in one step instead of flashing a placeholder first (avoids the page jumping around)
+
+function currentWxCityKey(){
+  const key = store.get('wx-city','roswell');
+  return WX_CITIES[key] ? key : 'roswell';
+}
+function initWxCitySelect(){
+  const sel = document.getElementById('wx-city');
+  sel.innerHTML = Object.entries(WX_CITIES).map(([k,c])=>`<option value="${k}">${c.label}</option>`).join('');
+  sel.value = currentWxCityKey();
+  sel.addEventListener('change', ()=>{
+    store.set('wx-city', sel.value);
+    wxLoadedOnce = false; // switching cities is a deliberate refresh — ok to show the loading state
+    loadWeather();
+  });
+}
+
 async function loadWeather(){
   const el = document.getElementById('wx-body');
+  const city = WX_CITIES[currentWxCityKey()];
+  if(!wxLoadedOnce) el.innerHTML = `<div class="wx-err">Loading forecast…</div>`;
   try{
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${WX_LAT}&longitude=${WX_LON}&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=7`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,weather_code&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America%2FNew_York&forecast_days=7`;
     const res = await fetch(url);
     if(!res.ok) throw new Error('bad response');
     const data = await res.json();
     const cur = data.current;
     const desc = WMO[cur.weather_code] || 'Unknown';
+
+    wxHourlyByDate = {};
+    data.hourly.time.forEach((t,i)=>{
+      const dateKey = t.split('T')[0];
+      (wxHourlyByDate[dateKey] = wxHourlyByDate[dateKey] || []).push({
+        time:t,
+        temp:Math.round(data.hourly.temperature_2m[i]),
+        code:data.hourly.weather_code[i],
+        precip:data.hourly.precipitation_probability[i],
+        wind:Math.round(data.hourly.wind_speed_10m[i])
+      });
+    });
+
     const days = data.daily.time.map((t,i)=>({
-      date:new Date(t+'T12:00:00'),
+      date:new Date(t+'T12:00:00'), key:t,
       hi:Math.round(data.daily.temperature_2m_max[i]),
       lo:Math.round(data.daily.temperature_2m_min[i]),
       code:data.daily.weather_code[i]
     }));
     const dayCards = days.map((d,i)=>{
       const label = i===0?'Today':new Intl.DateTimeFormat('en-US',{weekday:'short'}).format(d.date);
-      return `<div class="wx-day"><div class="d">${label}</div><div class="hi">${d.hi}°</div><div class="lo">${d.lo}°</div></div>`;
+      return `<div class="wx-day${i===0?' is-today':''}" data-date="${d.key}"><div class="d">${label}</div><div class="hi">${d.hi}°</div><div class="lo">${d.lo}°</div></div>`;
     }).join('');
     el.innerHTML = `
       <div class="wx-now">
@@ -412,15 +710,121 @@ async function loadWeather(){
       </div>
       <div class="wx-days">${dayCards}</div>
     `;
+    el.querySelectorAll('.wx-day').forEach(card=>{
+      card.addEventListener('click', ()=>openHourlyModal(card.dataset.date));
+    });
+    wxLoadedOnce = true;
   }catch(e){
-    el.innerHTML = `<div class="wx-err">Couldn't load forecast — check your internet connection and reopen this file.</div>`;
+    // on a background refresh, leave the last good forecast on screen instead of
+    // replacing it with an error — quieter, and stops the panel from resizing
+    if(!wxLoadedOnce) el.innerHTML = `<div class="wx-err">Couldn't load forecast — check your internet connection and reopen this file.</div>`;
+  }
+  loadWeatherAlerts(city);
+}
+
+/* ---------- weather icons (inline SVG, stroke=currentColor so CSS controls tint) ---------- */
+const WX_SVG = {
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.1" y2="4.9"/></svg>',
+  cloud: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 0-8 5.5 5.5 0 0 0-10.5 1.5A3.5 3.5 0 0 0 7 18z"/></svg>',
+  rain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 15h9a4 4 0 0 0 0-8 5 5 0 0 0-9.5 1.5A3.2 3.2 0 0 0 6.5 15z"/><line x1="8" y1="18" x2="7" y2="21"/><line x1="12" y1="18" x2="11" y2="21"/><line x1="16" y1="18" x2="15" y2="21"/></svg>',
+  storm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 13h9a4 4 0 0 0 0-8 5 5 0 0 0-9.5 1.5A3.2 3.2 0 0 0 6.5 13z"/><path d="M13 13l-3 5h3l-2 4"/></svg>',
+  wind: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h11a2.5 2.5 0 1 0-2.5-2.5"/><path d="M3 12h15a2.5 2.5 0 1 1-2.5 2.5"/><path d="M3 16h9a2 2 0 1 1-2 2"/></svg>'
+};
+function wxIconFor(code){
+  if(code>=95) return {svg:WX_SVG.storm, cls:'wx-storm'};
+  if([51,53,55,61,63,65,71,73,75,80,81,82].includes(code)) return {svg:WX_SVG.rain, cls:'wx-rain'};
+  if([0,1].includes(code)) return {svg:WX_SVG.sun, cls:'wx-sun'};
+  return {svg:WX_SVG.cloud, cls:''};
+}
+
+/* ---------- hourly forecast modal ---------- */
+function currentHourKey(){
+  const parts = new Intl.DateTimeFormat('en-US',{
+    timeZone:'America/New_York', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', hourCycle:'h23'
+  }).formatToParts(new Date()).reduce((a,p)=>(a[p.type]=p.value,a),{});
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}`;
+}
+
+function openHourlyModal(dateKey){
+  const hours = wxHourlyByDate[dateKey] || [];
+  const backdrop = document.getElementById('wx-modal-backdrop');
+  const title = document.getElementById('wx-modal-title');
+  const body = document.getElementById('wx-modal-body');
+  title.textContent = new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric'}).format(new Date(dateKey+'T12:00:00'));
+  if(hours.length===0){
+    body.innerHTML = `<div class="wx-err">No hourly data for this day.</div>`;
+  }else{
+    const nowKey = currentHourKey();
+    body.innerHTML = `<div class="hourly-strip">${hours.map(h=>{
+      const hourLabel = new Intl.DateTimeFormat('en-US',{hour:'numeric',hour12:true}).format(new Date(h.time));
+      const icon = wxIconFor(h.code);
+      const isNow = h.time.slice(0,13) === nowKey;
+      return `<div class="hourly-col${isNow?' current':''}" title="${escapeAttr(WMO[h.code]||'—')}">
+        <span class="hr-time">${hourLabel}</span>
+        <span class="hr-icon ${icon.cls}">${icon.svg}</span>
+        <span class="hr-temp">${h.temp}°</span>
+        <span class="hr-precip">${h.precip ?? 0}%</span>
+        <span class="hr-wind">${WX_SVG.wind}${h.wind ?? 0}mph</span>
+      </div>`;
+    }).join('')}</div>`;
+    const currentCol = body.querySelector('.hourly-col.current');
+    if(currentCol) requestAnimationFrame(()=> currentCol.scrollIntoView({inline:'center', block:'nearest'}));
+  }
+  backdrop.classList.remove('hidden');
+}
+function closeHourlyModal(){ document.getElementById('wx-modal-backdrop').classList.add('hidden'); }
+document.getElementById('wx-modal-close').addEventListener('click', closeHourlyModal);
+document.getElementById('wx-modal-backdrop').addEventListener('click', e=>{
+  if(e.target.id==='wx-modal-backdrop') closeHourlyModal();
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){ closeHourlyModal(); closeSyncModal(); closeFilterModal(); closeDayModal(); }
+});
+
+/* ---------- severe weather alerts (National Weather Service, free/no key, US-only) ---------- */
+async function loadWeatherAlerts(city){
+  const wrap = document.getElementById('wx-alerts');
+  const dismissed = JSON.parse(sessionStorage.getItem('dash:wx-alerts-dismissed') || '[]');
+  try{
+    const res = await fetch(`https://api.weather.gov/alerts/active?point=${city.lat},${city.lon}`);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json();
+    const alerts = (data.features || []).filter(f=>!dismissed.includes(f.properties.id));
+    if(alerts.length===0){ wrap.innerHTML=''; return; }
+    wrap.innerHTML = alerts.map(f=>{
+      const p = f.properties;
+      const sevClass = (p.severity==='Extreme'||p.severity==='Severe') ? '' : 'severity-moderate';
+      return `<div class="wx-alert ${sevClass}">
+        <div class="wx-alert-body">
+          <div class="wx-alert-title">${escapeHtml(p.event)}</div>
+          <div>${escapeHtml(p.headline||'')}</div>
+        </div>
+        <span class="wx-alert-close" data-id="${escapeAttr(p.id)}">✕</span>
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('.wx-alert-close').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const ids = JSON.parse(sessionStorage.getItem('dash:wx-alerts-dismissed') || '[]');
+        ids.push(el.dataset.id);
+        sessionStorage.setItem('dash:wx-alerts-dismissed', JSON.stringify(ids));
+        el.closest('.wx-alert').remove();
+      });
+    });
+  }catch(e){
+    wrap.innerHTML = '';
   }
 }
+
+initWxCitySelect();
 loadWeather();
+setInterval(loadWeather, 5 * 60 * 1000);
 
 /* ---------- calendar ---------- */
 let calView = new Date();
 calView.setDate(1);
+let syncedEvents = {}; // date key -> [{summary, allDay, source}], filtered view built from allSyncedEventsFlat
+let allSyncedEventsFlat = []; // every synced event from the last fetch, unfiltered
+let knownSources = []; // calendar labels seen in the last fetch (iCloud, Gmail, ...)
 function calKey(y,m,d){ return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 
 function renderCalendar(){
@@ -443,41 +847,120 @@ function renderCalendar(){
   for(let d=1; d<=daysInMonth; d++){
     const key = calKey(y,m,d);
     const hasEv = events[key] && events[key].length>0;
+    const hasSynced = syncedEvents[key] && syncedEvents[key].length>0;
     const isToday = isCurMonth && today.getDate()===d;
-    html += `<div class="cal-cell${isToday?' today':''}" data-key="${key}">${d}${hasEv?'<span class="ev-dot"></span>':''}</div>`;
+    let dots = '';
+    if(hasEv) dots += '<span class="ev-dot"></span>';
+    if(hasSynced) dots += '<span class="ev-dot synced"></span>';
+    html += `<div class="cal-cell${isToday?' today':''}" data-key="${key}">${d}${dots?`<div class="ev-dots">${dots}</div>`:''}</div>`;
   }
   grid.innerHTML = html;
   grid.querySelectorAll('.cal-cell:not(.empty)').forEach(cell=>{
-    cell.addEventListener('click', ()=>promptAddEvent(cell.dataset.key));
+    cell.addEventListener('click', ()=>openDayModal(cell.dataset.key));
   });
   renderUpcoming();
 }
 
-function promptAddEvent(key){
-  const text = prompt(`Add event for ${key} (leave blank to cancel):`);
-  if(!text) return;
+/* ---------- day detail modal (click a calendar day) ---------- */
+let dayModalKey = null;
+
+function openDayModal(key){
+  dayModalKey = key;
+  const [y,m,d] = key.split('-').map(Number);
+  document.getElementById('day-modal-title').textContent =
+    new Intl.DateTimeFormat('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}).format(new Date(y, m-1, d, 12));
+  document.getElementById('day-add-input').value = '';
+  renderDayModalEvents();
+  document.getElementById('day-modal-backdrop').classList.remove('hidden');
+  document.getElementById('day-add-input').focus();
+}
+
+function formatEvTime(hhmm){
+  if(!hhmm) return '';
+  const [h,m] = hhmm.split(':').map(Number);
+  const d = new Date(2000,0,1,h,m);
+  return new Intl.DateTimeFormat('en-US',{hour:'numeric',minute:'2-digit',hour12:true}).format(d);
+}
+
+function renderDayModalEvents(){
+  const key = dayModalKey;
   const events = store.get('events',{});
-  events[key] = events[key] || [];
-  events[key].push(text.trim());
+  const local = events[key] || [];
+  const synced = syncedEvents[key] || [];
+  const wrap = document.getElementById('day-modal-events');
+  if(local.length===0 && synced.length===0){
+    wrap.innerHTML = `<div class="empty-hint" style="padding:0 0 10px;">No events yet.</div>`;
+    return;
+  }
+  const localHtml = local.map((txt,idx)=>`
+    <div class="ev-item">
+      <div>${escapeHtml(txt)}</div>
+      <span class="rm" data-idx="${idx}">✕</span>
+    </div>`).join('');
+  const syncedHtml = synced.map(ev=>`
+    <div class="ev-item">
+      <div>${ev.time?`<span class="ev-when">${formatEvTime(ev.time)}</span>`:''}${escapeHtml(ev.summary)}<span class="ev-src">${escapeHtml(ev.source||'synced')}</span></div>
+    </div>`).join('');
+  wrap.innerHTML = localHtml + syncedHtml;
+  wrap.querySelectorAll('.rm').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const events = store.get('events',{});
+      events[key].splice(el.dataset.idx,1);
+      if(events[key].length===0) delete events[key];
+      store.set('events', events);
+      renderCalendar();
+      renderDayModalEvents();
+    });
+  });
+}
+
+function closeDayModal(){ document.getElementById('day-modal-backdrop').classList.add('hidden'); dayModalKey = null; }
+document.getElementById('day-modal-close').addEventListener('click', closeDayModal);
+document.getElementById('day-modal-backdrop').addEventListener('click', e=>{
+  if(e.target.id==='day-modal-backdrop') closeDayModal();
+});
+
+function addDayEvent(){
+  const input = document.getElementById('day-add-input');
+  const val = input.value.trim();
+  if(!val || !dayModalKey) return;
+  const events = store.get('events',{});
+  events[dayModalKey] = events[dayModalKey] || [];
+  events[dayModalKey].push(val);
   store.set('events', events);
+  input.value = '';
   renderCalendar();
+  renderDayModalEvents();
+}
+document.getElementById('day-add-btn').addEventListener('click', addDayEvent);
+document.getElementById('day-add-input').addEventListener('keydown', e=>{ if(e.key==='Enter') addDayEvent(); });
+
+function formatUpcomingDate(k){
+  const [,mm,dd] = k.split('-');
+  return `${parseInt(mm,10)}-${dd}`;
 }
 
 function renderUpcoming(){
   const events = store.get('events',{});
   const todayKey = calKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-  const keys = Object.keys(events).filter(k=>k>=todayKey).sort().slice(0,8);
+  const allKeys = new Set([...Object.keys(events), ...Object.keys(syncedEvents)]);
+  const keys = [...allKeys].filter(k=>k>=todayKey).sort().slice(0,8);
   const list = document.getElementById('cal-events-list');
   if(keys.length===0){
     list.innerHTML = `<div class="empty-hint">No upcoming events yet — click a day on the calendar.</div>`;
     return;
   }
   list.innerHTML = keys.map(k=>{
-    return events[k].map((txt,idx)=>`
+    const local = (events[k]||[]).map((txt,idx)=>`
       <div class="ev-item">
-        <div><span class="ev-when">${k.slice(5)}</span>${txt}</div>
+        <div><span class="ev-when">${formatUpcomingDate(k)}</span>${escapeHtml(txt)}</div>
         <span class="rm" data-key="${k}" data-idx="${idx}">✕</span>
       </div>`).join('');
+    const synced = (syncedEvents[k]||[]).map(ev=>`
+      <div class="ev-item">
+        <div><span class="ev-when">${formatUpcomingDate(k)}</span>${ev.time?`<span class="ev-when">${formatEvTime(ev.time)}</span>`:''}${escapeHtml(ev.summary)}<span class="ev-src">${escapeHtml(ev.source||'synced')}</span></div>
+      </div>`).join('');
+    return local + synced;
   }).join('');
   list.querySelectorAll('.rm').forEach(el=>{
     el.addEventListener('click', ()=>{
@@ -493,6 +976,176 @@ function renderUpcoming(){
 document.getElementById('cal-prev').addEventListener('click', ()=>{ calView.setMonth(calView.getMonth()-1); renderCalendar(); });
 document.getElementById('cal-next').addEventListener('click', ()=>{ calView.setMonth(calView.getMonth()+1); renderCalendar(); });
 renderCalendar();
+
+/* ---------- iPhone calendar sync (read-only iCloud/Google ICS subscriptions, fetched server-side by server.py) ---------- */
+async function loadSyncedEvents(){
+  try{
+    const res = await fetch('/api/calendar-events');
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json();
+    allSyncedEventsFlat = data.events || [];
+    knownSources = (data.sources || []).map(s=>s.label);
+    updateSyncNote(data);
+    rebuildSyncedEvents();
+  }catch(e){
+    updateSyncNote({configured:false, unreachable:true});
+  }
+}
+
+/* ---------- calendar filter (All calendars vs a chosen subset) ---------- */
+function currentFilterSelection(){
+  const stored = store.get('cal-filter-selected', null);
+  return stored===null ? [...knownSources] : stored; // default: everything visible
+}
+
+function rebuildSyncedEvents(){
+  const mode = store.get('cal-filter-mode','all');
+  const selected = currentFilterSelection();
+  syncedEvents = {};
+  allSyncedEventsFlat.forEach(ev=>{
+    if(mode==='custom' && !selected.includes(ev.source)) return;
+    (syncedEvents[ev.date] = syncedEvents[ev.date] || []).push(ev);
+  });
+  renderCalendar();
+}
+
+function openFilterModal(){
+  const mode = store.get('cal-filter-mode','all');
+  document.querySelectorAll('input[name="cal-filter-mode"]').forEach(r=>{ r.checked = (r.value===mode); });
+  const listEl = document.getElementById('cal-filter-list');
+  if(knownSources.length===0){
+    listEl.innerHTML = `<div class="filter-empty">No calendars connected yet — click "⚙ Sync calendars" first.</div>`;
+  }else{
+    const selected = currentFilterSelection();
+    listEl.innerHTML = knownSources.map(label=>`
+      <label class="filter-check">
+        <input type="checkbox" data-label="${escapeAttr(label)}" ${selected.includes(label)?'checked':''}>
+        ${escapeHtml(label)}
+      </label>`).join('');
+    listEl.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        const chosen = [...listEl.querySelectorAll('input[type=checkbox]:checked')].map(c=>c.dataset.label);
+        store.set('cal-filter-selected', chosen);
+        rebuildSyncedEvents();
+      });
+    });
+  }
+  listEl.classList.toggle('disabled', mode!=='custom');
+  document.getElementById('cal-filter-modal-backdrop').classList.remove('hidden');
+}
+function closeFilterModal(){ document.getElementById('cal-filter-modal-backdrop').classList.add('hidden'); }
+
+document.getElementById('cal-filter-btn').addEventListener('click', openFilterModal);
+document.getElementById('cal-filter-modal-close').addEventListener('click', closeFilterModal);
+document.getElementById('cal-filter-modal-backdrop').addEventListener('click', e=>{
+  if(e.target.id==='cal-filter-modal-backdrop') closeFilterModal();
+});
+document.querySelectorAll('input[name="cal-filter-mode"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    store.set('cal-filter-mode', r.value);
+    document.getElementById('cal-filter-list').classList.toggle('disabled', r.value!=='custom');
+    rebuildSyncedEvents();
+  });
+});
+
+function updateSyncNote(data){
+  const note = document.getElementById('cal-sync-note');
+  if(data.unreachable){
+    note.textContent = "Click a day to add an event. Can't reach the local server for calendar sync — make sure server.py is running (see README).";
+  }else if(!data.configured){
+    note.textContent = 'Click a day to add an event. No synced calendars yet — click "⚙ Sync calendars" above to connect iCloud, Google, or another ICS feed.';
+  }else{
+    const sources = data.sources || [];
+    const ok = sources.filter(s=>!s.error).map(s=>s.label);
+    const failed = sources.filter(s=>s.error);
+    const n = (data.events||[]).length;
+    let txt = 'Click a day to add an event. ';
+    if(ok.length) txt += `Synced with ${ok.join(', ')} — ${n} upcoming event${n===1?'':'s'} pulled in (read-only, refreshes every 15 min).`;
+    if(failed.length) txt += ` ${failed.map(s=>`${s.label} sync failed: ${s.error}`).join('; ')}`;
+    note.textContent = txt;
+  }
+}
+
+async function loadSyncList(){
+  const listEl = document.getElementById('cal-sync-connected');
+  listEl.innerHTML = `<div class="sync-connected-empty">Loading…</div>`;
+  try{
+    const res = await fetch('/api/ical-config');
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const calendars = data.calendars || [];
+    if(calendars.length === 0){
+      listEl.innerHTML = `<div class="sync-connected-empty">No calendars connected yet.</div>`;
+      return;
+    }
+    listEl.innerHTML = calendars.map(c=>`
+      <div class="sync-connected-item">
+        <div class="sync-connected-info">
+          <div class="sync-connected-label">${escapeHtml(c.label)}</div>
+          <div class="sync-connected-url">${escapeHtml(c.url)}</div>
+        </div>
+        <button class="sync-remove-btn" data-url="${escapeAttr(c.url)}" title="Remove this calendar">✕</button>
+      </div>`).join('');
+    listEl.querySelectorAll('.sync-remove-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        btn.disabled = true;
+        try{
+          await fetch('/api/ical-config/remove', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({url: btn.dataset.url})
+          });
+          await loadSyncList();
+          loadSyncedEvents();
+        }catch(e){
+          btn.disabled = false;
+        }
+      });
+    });
+  }catch(e){
+    console.error('loadSyncList failed:', e);
+    listEl.innerHTML = `<div class="sync-connected-empty">Couldn't load (${escapeHtml(String(e.message||e))}) — make sure server.py is running and the dashboard is open via http://127.0.0.1:8420, not as a local file.</div>`;
+  }
+}
+
+function openSyncModal(){
+  document.getElementById('cal-sync-label').value = '';
+  document.getElementById('cal-sync-url').value = '';
+  document.getElementById('cal-sync-error').textContent = '';
+  loadSyncList();
+  document.getElementById('cal-sync-modal-backdrop').classList.remove('hidden');
+  document.getElementById('cal-sync-label').focus();
+}
+function closeSyncModal(){ document.getElementById('cal-sync-modal-backdrop').classList.add('hidden'); }
+
+document.getElementById('cal-sync-btn').addEventListener('click', openSyncModal);
+document.getElementById('cal-sync-modal-close').addEventListener('click', closeSyncModal);
+document.getElementById('cal-sync-cancel').addEventListener('click', closeSyncModal);
+document.getElementById('cal-sync-modal-backdrop').addEventListener('click', e=>{
+  if(e.target.id==='cal-sync-modal-backdrop') closeSyncModal();
+});
+document.getElementById('cal-sync-save').addEventListener('click', async ()=>{
+  const label = document.getElementById('cal-sync-label').value.trim();
+  const url = document.getElementById('cal-sync-url').value.trim();
+  const errEl = document.getElementById('cal-sync-error');
+  if(!label || !url){ errEl.textContent = 'Both a label and a link are required.'; return; }
+  errEl.textContent = '';
+  try{
+    const res = await fetch('/api/ical-config', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({label, url})
+    });
+    if(!res.ok) throw new Error();
+    closeSyncModal();
+    loadSyncedEvents();
+  }catch(e){
+    errEl.textContent = "Couldn't save that link — make sure server.py is running (open the dashboard via http://127.0.0.1:8420, not the file directly).";
+  }
+});
+
+loadSyncedEvents();
+setInterval(loadSyncedEvents, 15 * 60 * 1000);
 
 /* ---------- projects ---------- */
 function renderProjects(){
@@ -574,7 +1227,7 @@ function renderShortcuts(){
   const wrap = document.getElementById('sc-grid');
   if(items.length===0){ wrap.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">No shortcuts yet — add a link or local path above.</div>`; return; }
   wrap.innerHTML = items.map((s,i)=>`
-    <a class="shortcut" href="${escapeAttr(s.url)}" target="_blank" rel="noopener">
+    <a class="shortcut" href="${escapeAttr(s.url)}" target="_blank" rel="noopener" draggable="true" data-i="${i}">
       <span>${escapeHtml(s.name)}</span>
       <span class="rm" data-i="${i}" onclick="event.preventDefault();event.stopPropagation();">✕</span>
     </a>`).join('');
@@ -583,6 +1236,41 @@ function renderShortcuts(){
       const items = store.get('shortcuts',[]);
       items.splice(el.dataset.i,1);
       store.set('shortcuts', items);
+      renderShortcuts();
+    });
+  });
+
+  let dragSrc = null;
+  wrap.querySelectorAll('.shortcut').forEach(el=>{
+    el.addEventListener('dragstart', e=>{
+      dragSrc = el;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', el.dataset.i);
+    });
+    el.addEventListener('dragend', ()=>{
+      el.classList.remove('dragging');
+      wrap.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));
+    });
+    el.addEventListener('dragover', e=>{
+      if(!dragSrc || el===dragSrc) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      el.classList.add('drag-over');
+    });
+    el.addEventListener('dragleave', ()=>{
+      el.classList.remove('drag-over');
+    });
+    el.addEventListener('drop', e=>{
+      e.preventDefault();
+      el.classList.remove('drag-over');
+      if(!dragSrc || el===dragSrc) return;
+      const from = +dragSrc.dataset.i;
+      const to = +el.dataset.i;
+      const current = store.get('shortcuts',[]);
+      const [moved] = current.splice(from,1);
+      current.splice(to,0,moved);
+      store.set('shortcuts', current);
       renderShortcuts();
     });
   });
@@ -616,6 +1304,73 @@ notesEl.addEventListener('input', ()=>{
     store.set('notes', notesEl.value);
     notesState.textContent = 'saved ' + new Date().toLocaleTimeString();
   }, 500);
+});
+
+/* ---------- bluetooth battery ---------- */
+/* fetch() doesn't support file:// in Chrome — XHR does, when the page itself is file://. */
+function loadBluetoothBattery(){
+  const listEl = document.getElementById('bt-list');
+  const tagEl = document.getElementById('bt-tag');
+  const updatedEl = document.getElementById('bt-updated');
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', 'battery.json?_=' + Date.now(), true);
+  xhr.onload = function(){
+    if(xhr.status !== 0 && xhr.status !== 200){ showBtError(); return; }
+    try{
+      const data = JSON.parse(xhr.responseText);
+      const devices = data.devices || [];
+      if(devices.length === 0){
+        listEl.innerHTML = `<li class="empty-hint" style="border:none;">No Bluetooth devices with battery reporting found.</li>`;
+        tagEl.textContent = '0 devices';
+        updatedEl.textContent = '';
+        return;
+      }
+      tagEl.textContent = devices.length + (devices.length===1?' device':' devices');
+      listEl.innerHTML = devices.map(d=>{
+        const lvlClass = d.battery<=15 ? 'low' : d.battery<=39 ? 'mid' : '';
+        return `
+          <li class="bt-item">
+            <span class="bt-name${d.online?'':' offline'}">${escapeHtml(d.name)}</span>
+            <div class="bt-bar"><div class="bt-bar-fill ${lvlClass}" style="width:${d.battery}%;"></div></div>
+            <span class="bt-pct">${d.battery}%</span>
+          </li>`;
+      }).join('');
+      const updated = new Date(data.updated);
+      const ageMin = Math.round((Date.now()-updated.getTime())/60000);
+      const ageStr = ageMin<1 ? 'just now' : ageMin===1 ? '1 min ago' : ageMin<60 ? ageMin+' min ago' : Math.round(ageMin/60)+' hr ago';
+      updatedEl.textContent = `updated ${ageStr}` + (ageMin>15 ? ' — background checker may not be running' : '');
+    }catch(e){ showBtError(); }
+  };
+  xhr.onerror = showBtError;
+  xhr.send();
+  function showBtError(){
+    listEl.innerHTML = `<li class="empty-hint" style="border:none;">Couldn't read battery.json — make sure check-bluetooth-battery.ps1 has run at least once in this folder.</li>`;
+    tagEl.textContent = 'no data';
+    updatedEl.textContent = '';
+  }
+}
+loadBluetoothBattery();
+setInterval(loadBluetoothBattery, 30000);
+
+/* manual poll — hits server.py's /api/poll-bluetooth, which runs
+   check-bluetooth-battery.ps1 synchronously, instead of waiting on the
+   (currently disabled) scheduled-task watchdog. */
+const btPollBtn = document.getElementById('bt-poll');
+btPollBtn.addEventListener('click', async ()=>{
+  btPollBtn.disabled = true;
+  btPollBtn.classList.add('spinning');
+  const updatedEl = document.getElementById('bt-updated');
+  try{
+    const res = await fetch('/api/poll-bluetooth', {method:'POST'});
+    const data = await res.json().catch(()=>({ok:res.ok}));
+    if(!data.ok) updatedEl.textContent = 'poll failed — see server.py console';
+    loadBluetoothBattery();
+  }catch(e){
+    updatedEl.textContent = 'poll failed — is the local server running?';
+  }finally{
+    btPollBtn.disabled = false;
+    btPollBtn.classList.remove('spinning');
+  }
 });
 
 /* ---------- utils ---------- */

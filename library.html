@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Taygeta Library</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233b1015'/%3E%3Cpath d='M16 14h9a5 5 0 0 1 5 5v31a4 4 0 0 0-4-4h-10z' fill='none' stroke='%23d4af37' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M48 14h-9a5 5 0 0 0-5 5v31a4 4 0 0 1 4-4h10z' fill='none' stroke='%23d4af37' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"></noscript>
+<style>
+  /* This page intentionally breaks from the rest of the dashboard's dark/teal
+     theme — an old-fashioned library reading room, by request. Scoped to this
+     file only; dashboard.html and its palette are untouched. */
+  :root{
+    --wall:#3a1016;
+    --wall-2:#280a0f;
+    --mahogany-light:#7a4f30;
+    --mahogany:#5c3a24;
+    --mahogany-dark:#38220f;
+    --mahogany-deep:#241407;
+    --brass:#c9a227;
+    --brass-light:#e8cf7a;
+    --brass-dark:#8a6a15;
+    --navy:#16233d;
+    --navy-light:#2c4370;
+    --navy-dark:#0b1526;
+    --parchment:#ece0c4;
+    --text:#f1e6d0;
+    --text-dim:#c9b89c;
+    --text-faint:#8a7357;
+    --danger:#e08a7a;
+    --radius:6px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 20% 10%, rgba(120,40,40,0.25), transparent 55%),
+      radial-gradient(circle at 85% 60%, rgba(90,20,25,0.3), transparent 50%),
+      var(--wall);
+    color:var(--text);
+    font-family:'Crimson Text',Georgia,serif;
+    min-height:100vh;
+  }
+
+  /* ---------- crown molding, top and bottom of the whole page ----------
+     Dentil-block pattern (small alternating teeth) — deliberately not the
+     vertical wood-grain lines the bookcases use below, so the trim reads as
+     a distinct architectural element rather than more shelving. */
+  .molding{
+    height:38px;
+    background:
+      repeating-linear-gradient(90deg,
+        rgba(0,0,0,0.4) 0 3px, rgba(255,255,255,0.14) 3px 4px,
+        transparent 4px 16px, rgba(0,0,0,0.32) 16px 19px, transparent 19px 24px),
+      linear-gradient(180deg, var(--mahogany-light) 0%, var(--mahogany) 40%, var(--mahogany-dark) 75%, var(--mahogany-deep) 100%);
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,0.14),
+      inset 0 -3px 6px rgba(0,0,0,0.45),
+      0 4px 14px rgba(0,0,0,0.55);
+  }
+  .molding-bottom{
+    background:
+      repeating-linear-gradient(90deg,
+        rgba(0,0,0,0.4) 0 3px, rgba(255,255,255,0.14) 3px 4px,
+        transparent 4px 16px, rgba(0,0,0,0.32) 16px 19px, transparent 19px 24px),
+      linear-gradient(0deg, var(--mahogany-light) 0%, var(--mahogany) 40%, var(--mahogany-dark) 75%, var(--mahogany-deep) 100%);
+    box-shadow:
+      inset 0 -2px 0 rgba(255,255,255,0.1),
+      inset 0 3px 6px rgba(0,0,0,0.45),
+      0 -4px 14px rgba(0,0,0,0.55);
+  }
+
+  .wrap{max-width:1240px;margin:0 auto;padding:30px 28px;}
+
+  /* ---------- topbar ---------- */
+  .lib-topbar{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:30px;flex-wrap:wrap;gap:14px;
+  }
+  .lib-back{
+    font-family:'Crimson Text',serif;font-size:14px;color:var(--text-dim);
+    text-decoration:none;border-bottom:1px solid transparent;
+  }
+  .lib-back:hover{color:var(--brass-light);border-color:var(--brass-light);}
+  .lib-title{
+    font-family:'Playfair Display',serif;font-weight:800;font-size:30px;
+    letter-spacing:1px;margin:0;color:var(--parchment);
+    text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  }
+  .lib-count{font-size:13px;color:var(--text-faint);letter-spacing:.5px;margin-top:4px;font-style:italic;}
+  .lib-controls{display:flex;align-items:center;gap:10px;font-family:'Crimson Text',serif;}
+  .lib-btn{
+    background:linear-gradient(180deg, var(--navy-light), var(--navy));
+    border:1px solid var(--navy-dark);color:var(--parchment);
+    border-radius:5px;padding:7px 14px;font-size:13.5px;cursor:pointer;
+    font-family:'Crimson Text',serif;letter-spacing:.3px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+  .lib-btn:hover{border-color:var(--brass);color:var(--brass-light);}
+  .lib-btn:disabled{opacity:.55;cursor:default;}
+
+  /* ---------- bookcases ---------- */
+  .case-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px;}
+  .bookcase{margin:0 auto 40px;}
+  .case-row .bookcase{margin-bottom:0;}
+  .plaque{
+    width:max-content;margin:0 auto 12px;padding:7px 28px;
+    background:linear-gradient(180deg, var(--brass-light), var(--brass) 55%, var(--brass-dark));
+    border:1px solid #5f4711;border-radius:3px;
+    box-shadow:0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.5);
+    font-family:'Playfair Display',serif;font-weight:700;font-size:13px;
+    letter-spacing:3px;text-transform:uppercase;color:#2b1c05;
+    text-shadow:0 1px 0 rgba(255,255,255,0.35);
+  }
+  .case-frame{
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0 3px, transparent 3px 42px),
+      linear-gradient(180deg, var(--mahogany-light), var(--mahogany) 45%, var(--mahogany-dark));
+    border:10px solid var(--mahogany-dark);
+    border-radius:4px;
+    padding:16px 14px 4px;
+    position:relative;
+    box-shadow:0 14px 34px rgba(0,0,0,0.55), inset 0 0 46px rgba(0,0,0,0.4);
+  }
+  .case-frame::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    box-shadow:inset 0 14px 18px -10px rgba(0,0,0,0.55), inset 0 -14px 18px -10px rgba(0,0,0,0.4);
+  }
+
+  .shelf{margin-bottom:16px;}
+  .shelf-row{
+    display:flex;align-items:flex-end;gap:5px;
+    min-height:184px;padding:0 8px 10px;overflow-x:auto;
+    background:linear-gradient(180deg, rgba(0,0,0,0.22), transparent 30%);
+  }
+  .shelf-board{
+    height:15px;margin:0 2px;border-radius:0 0 3px 3px;
+    background:linear-gradient(180deg, #7a4f30, #2c1a0c);
+    box-shadow:0 5px 9px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.16);
+  }
+  .shelf-empty{
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-faint);font-style:italic;font-size:14px;width:100%;
+  }
+
+  /* ---------- book spines ---------- */
+  .book-spine{
+    writing-mode:vertical-rl;flex-shrink:0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    padding:10px 0;border-radius:2px 2px 0 0;
+    font-family:'Crimson Text',serif;font-weight:600;font-size:12.5px;letter-spacing:.4px;
+    color:rgba(255,226,160,0.94);text-shadow:0 1px 1px rgba(0,0,0,0.55);
+    border:1px solid rgba(0,0,0,0.4);border-bottom:none;
+    box-shadow:
+      inset 2px 0 0 rgba(255,255,255,0.1),
+      inset -3px 0 0 rgba(0,0,0,0.28),
+      inset 0 6px 0 -2px rgba(255,215,140,0.35),
+      inset 0 -10px 0 -8px rgba(255,215,140,0.35),
+      2px 3px 7px rgba(0,0,0,0.45);
+    transition:transform .15s ease;
+    overflow:hidden;
+  }
+  .book-spine:hover{transform:translateY(-8px);}
+  .book-spine .spine-title{max-height:100%;overflow:hidden;}
+
+  /* ---------- face-out book covers (Reading / Read shelves) ---------- */
+  .shelf-row-covers{align-items:flex-end;gap:14px;}
+  .book-cover-face{
+    flex-shrink:0;cursor:pointer;position:relative;
+    width:104px;height:156px;border-radius:2px;overflow:hidden;
+    box-shadow:3px 5px 12px rgba(0,0,0,0.5), inset -2px 0 3px rgba(0,0,0,0.3);
+    transition:transform .15s ease;
+    background:#2c1a0c;
+  }
+  .book-cover-face img{width:100%;height:100%;object-fit:cover;display:block;}
+  .book-cover-face::after{
+    content:'';position:absolute;top:2px;bottom:2px;right:-5px;width:5px;border-radius:0 2px 2px 0;
+    background:repeating-linear-gradient(180deg, #ece0c4 0 2px, #d9cba8 2px 3px);
+    box-shadow:1px 1px 3px rgba(0,0,0,0.4);
+  }
+  .book-cover-face:hover{transform:translateY(-8px);}
+  .book-cover-face .cover-fallback-title{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    padding:12px;text-align:center;font-family:'Playfair Display',serif;font-size:13px;font-weight:700;
+    color:rgba(255,226,160,0.92);text-shadow:0 1px 2px rgba(0,0,0,0.6);
+  }
+
+  /* ---------- shortcut settings / rescan status line ---------- */
+  .lib-status{
+    text-align:center;color:var(--text-faint);font-size:12.5px;margin:-16px 0 30px;
+    font-style:italic;
+  }
+  .lib-status a{color:var(--brass-light);cursor:pointer;text-decoration:underline;}
+
+  /* ---------- modals ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(10,4,5,0.72);backdrop-filter:blur(2px);
+    display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal-backdrop.hidden{display:none;}
+  .modal{
+    background:linear-gradient(180deg,#4a1a20,#33121a);
+    border:1px solid var(--mahogany-dark);border-radius:var(--radius);
+    padding:24px;max-width:480px;width:100%;max-height:84vh;overflow-y:auto;
+    box-shadow:0 20px 50px rgba(0,0,0,0.6);
+  }
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .modal-head h3{margin:0;font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--parchment);}
+  .modal-close{background:none;border:none;color:var(--text-faint);font-size:19px;cursor:pointer;line-height:1;font-family:serif;}
+  .modal-close:hover{color:var(--brass-light);}
+
+  .book-modal-body{display:flex;gap:18px;}
+  .book-cover{
+    flex-shrink:0;width:110px;height:160px;border-radius:3px;overflow:hidden;
+    box-shadow:0 6px 16px rgba(0,0,0,0.5);
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg,#5c3a24,#2c1a0c);
+    color:rgba(255,226,160,0.85);font-family:'Playfair Display',serif;font-size:12px;
+    text-align:center;padding:10px;font-weight:700;
+  }
+  .book-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+  .book-info{flex:1;min-width:0;}
+  .book-modal-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin:0 0 4px;color:var(--parchment);}
+  .book-modal-author{color:var(--text-dim);font-size:14px;font-style:italic;margin-bottom:14px;}
+  .status-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+  .status-btn{
+    background:rgba(255,255,255,0.04);border:1px solid var(--mahogany-light);color:var(--text-dim);
+    border-radius:20px;padding:5px 13px;font-size:12.5px;cursor:pointer;font-family:'Crimson Text',serif;
+  }
+  .status-btn:hover{border-color:var(--brass-light);color:var(--brass-light);}
+  .status-btn.active{background:linear-gradient(180deg,var(--brass-light),var(--brass));border-color:var(--brass-dark);color:#2b1c05;font-weight:600;}
+  .modal-label{display:block;font-size:11.5px;color:var(--text-faint);margin:0 0 5px;letter-spacing:.5px;text-transform:uppercase;font-family:'Crimson Text',serif;}
+  .modal-textarea{
+    width:100%;background:rgba(0,0,0,0.22);border:1px solid var(--mahogany-light);
+    color:var(--text);border-radius:6px;padding:8px 10px;font-size:13.5px;
+    font-family:'Crimson Text',serif;resize:vertical;line-height:1.5;
+  }
+  .modal-textarea:focus{outline:none;border-color:var(--brass-light);}
+  .modal-filename{font-size:11px;color:var(--text-faint);margin-top:10px;}
+
+  .sync-label{display:block;font-size:11.5px;color:var(--text-faint);margin:0 0 6px;letter-spacing:.5px;text-transform:uppercase;font-family:'Crimson Text',serif;}
+  .sync-input{
+    width:100%;background:rgba(0,0,0,0.22);border:1px solid var(--mahogany-light);
+    color:var(--text);border-radius:6px;padding:8px 10px;font-size:13.5px;font-family:'Crimson Text',serif;
+  }
+  .sync-input:focus{outline:none;border-color:var(--brass-light);}
+  .sync-help{font-size:12.5px;color:var(--text-dim);line-height:1.6;margin-top:14px;}
+  .sync-error{color:var(--danger);font-size:12.5px;margin-top:10px;min-height:14px;}
+  .sync-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+  .sync-actions button{border-radius:6px;padding:7px 15px;font-size:13.5px;cursor:pointer;font-family:'Crimson Text',serif;}
+  .sync-cancel{background:none;border:1px solid var(--mahogany-light);color:var(--text-dim);}
+  .sync-cancel:hover{border-color:var(--text-dim);color:var(--text);}
+  .sync-save{background:linear-gradient(180deg,var(--brass-light),var(--brass));border:1px solid var(--brass-dark);color:#2b1c05;font-weight:600;}
+  .sync-save:hover{filter:brightness(1.08);}
+
+  @media (max-width:900px){
+    .case-row{grid-template-columns:1fr;}
+  }
+  @media (max-width:700px){
+    .wrap{padding:22px 14px;}
+    .lib-title{font-size:24px;}
+    .molding{height:26px;}
+    .case-frame{padding:14px 8px 4px;border-width:7px;}
+  }
+</style>
+</head>
+<body>
+<div class="molding molding-top"></div>
+
+<div class="wrap">
+  <div class="lib-topbar">
+    <div>
+      <a href="dashboard.html" class="lib-back">‹ Dashboard</a>
+      <h1 class="lib-title">Taygeta Library</h1>
+      <div class="lib-count" id="lib-count"></div>
+    </div>
+    <div class="lib-controls">
+      <button class="lib-btn" id="lib-settings-btn">Folder…</button>
+      <button class="lib-btn" id="lib-rescan-btn">Rescan</button>
+    </div>
+  </div>
+
+  <div class="lib-status" id="lib-status"></div>
+
+  <div class="case-row">
+    <section class="bookcase">
+      <div class="plaque">Reading</div>
+      <div class="case-frame"><div class="shelf" id="case-reading"></div></div>
+    </section>
+
+    <section class="bookcase">
+      <div class="plaque">Read</div>
+      <div class="case-frame"><div class="shelf" id="case-read"></div></div>
+    </section>
+  </div>
+
+  <section class="bookcase">
+    <div class="plaque">Collection <span style="font-size:10px;opacity:.75;">A&ndash;Z</span></div>
+    <div class="case-frame"><div class="shelf" id="case-collection"></div></div>
+  </section>
+</div>
+
+<div class="molding molding-bottom"></div>
+
+<!-- book detail modal -->
+<div class="modal-backdrop hidden" id="book-modal-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Book</h3>
+      <button class="modal-close" id="book-modal-close">✕</button>
+    </div>
+    <div class="book-modal-body">
+      <div class="book-cover" id="book-modal-cover"></div>
+      <div class="book-info">
+        <div class="book-modal-title" id="book-modal-title"></div>
+        <div class="book-modal-author" id="book-modal-author"></div>
+        <div class="status-row" id="book-modal-status">
+          <button class="status-btn" data-status="unread">Want to Read</button>
+          <button class="status-btn" data-status="reading">Reading</button>
+          <button class="status-btn" data-status="read">Read</button>
+        </div>
+        <label class="modal-label" for="book-modal-notes">Notes</label>
+        <textarea id="book-modal-notes" class="modal-textarea" rows="4" placeholder="Thoughts, quotes, where you left off…"></textarea>
+        <div class="modal-filename" id="book-modal-filename"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- folder settings modal -->
+<div class="modal-backdrop hidden" id="folder-modal-backdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Epub folder</h3>
+      <button class="modal-close" id="folder-modal-close">✕</button>
+    </div>
+    <label class="sync-label" for="folder-input">Folder path (read by the local server)</label>
+    <input id="folder-input" class="sync-input" placeholder="C:\Users\Will\Downloads\Books">
+    <div class="sync-help">This is the folder you stage epubs in before sending them to your Kindle. The shelves are rebuilt from whatever <code>.epub</code> files are in it.</div>
+    <div class="sync-error" id="folder-error"></div>
+    <div class="sync-actions">
+      <button class="sync-cancel" id="folder-cancel">Cancel</button>
+      <button class="sync-save" id="folder-save">Save &amp; rescan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- storage (localStorage — reading status/notes live client-side; the
+   epub metadata itself is re-read from disk each scan, not stored here) ---------- */
+const store = {
+  get(k, fallback){ try{ const v = localStorage.getItem('lib:'+k); return v===null? fallback : JSON.parse(v);}catch(e){return fallback;} },
+  set(k, v){ localStorage.setItem('lib:'+k, JSON.stringify(v)); }
+};
+
+let books = [];               // flat list from the last scan: {id, title, author, cover, filename}
+let booksById = {};
+
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* deterministic per-book styling — same book always gets the same spine */
+const SPINE_COLORS = ['#7a1f2b','#234d35','#1f3350','#4a2350','#8a5a1f','#1f4d4a','#6b2f14','#33324a','#5c1f3d','#2f4d1f'];
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return Math.abs(h); }
+function shade(hex, amt){
+  const n = parseInt(hex.slice(1),16);
+  let r=(n>>16)+amt, g=((n>>8)&255)+amt, b=(n&255)+amt;
+  r=Math.max(0,Math.min(255,r)); g=Math.max(0,Math.min(255,g)); b=Math.max(0,Math.min(255,b));
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+}
+
+function spineEl(book){
+  const h = hashStr(book.id);
+  // color-matched to the book's real cover art when available (sampled server-side
+  // from the actual epub cover); falls back to the old hash palette otherwise
+  const color = book.spineColor || SPINE_COLORS[h % SPINE_COLORS.length];
+  const width = 30 + (h % 6) * 4;      // 30-54px
+  const height = 148 + (h % 5) * 10;   // 148-188px
+  const el = document.createElement('div');
+  el.className = 'book-spine';
+  el.style.width = width + 'px';
+  el.style.height = height + 'px';
+  el.style.background = `linear-gradient(90deg, ${shade(color,18)}, ${color} 18%, ${shade(color,-14)} 100%)`;
+  el.title = book.title + (book.author ? ' — ' + book.author : '');
+  el.innerHTML = `<span class="spine-title">${escapeHtml(book.title)}</span>`;
+  el.addEventListener('click', () => openBookModal(book.id));
+  return el;
+}
+
+function coverEl(book){
+  const el = document.createElement('div');
+  el.className = 'book-cover-face';
+  el.title = book.title + (book.author ? ' — ' + book.author : '');
+  if(book.cover){
+    // built via DOM APIs rather than innerHTML templating, so book.cover can never
+    // be interpreted as markup no matter what a crafted epub's cover data contains
+    const img = document.createElement('img');
+    img.src = book.cover;
+    img.alt = '';
+    el.replaceChildren(img);
+  }else{
+    // no embedded cover — fall back to the same color-matched treatment as a spine
+    const h = hashStr(book.id);
+    const color = book.spineColor || SPINE_COLORS[h % SPINE_COLORS.length];
+    el.style.background = `linear-gradient(160deg, ${shade(color,18)}, ${shade(color,-18)})`;
+    el.innerHTML = `<span class="cover-fallback-title">${escapeHtml(book.title)}</span>`;
+  }
+  el.addEventListener('click', () => openBookModal(book.id));
+  return el;
+}
+
+function chunk(arr, n){ const out=[]; for(let i=0;i<arr.length;i+=n) out.push(arr.slice(i,i+n)); return out; }
+
+/* mode: 'spine' (Collection — the classic row-of-spines look) or 'cover' (Reading/Read
+   — face-out cover art, since those lists are short enough that seeing the actual
+   covers is more useful than scanning spine text) */
+function renderShelfRow(container, list, emptyText, mode){
+  container.innerHTML = '';
+  if(list.length === 0){
+    const row = document.createElement('div');
+    row.className = 'shelf-row';
+    row.innerHTML = `<div class="shelf-empty">${escapeHtml(emptyText)}</div>`;
+    container.appendChild(row);
+    const board = document.createElement('div');
+    board.className = 'shelf-board';
+    container.appendChild(board);
+    return;
+  }
+  const perRow = mode === 'cover' ? 10 : 22;
+  chunk(list, perRow).forEach(group => {
+    const row = document.createElement('div');
+    row.className = mode === 'cover' ? 'shelf-row shelf-row-covers' : 'shelf-row';
+    group.forEach(b => row.appendChild(mode === 'cover' ? coverEl(b) : spineEl(b)));
+    container.appendChild(row);
+    const board = document.createElement('div');
+    board.className = 'shelf-board';
+    container.appendChild(board);
+  });
+}
+
+function renderShelves(){
+  const statuses = store.get('statuses', {});
+  const reading = books.filter(b => statuses[b.id] === 'reading');
+  const read = books.filter(b => statuses[b.id] === 'read');
+  const collection = [...books].sort((a,b) => a.title.localeCompare(b.title));
+
+  renderShelfRow(document.getElementById('case-reading'), reading, 'Nothing here yet — mark a book "Reading" from its details.', 'cover');
+  renderShelfRow(document.getElementById('case-read'), read, 'Nothing finished yet.', 'cover');
+  renderShelfRow(document.getElementById('case-collection'), collection, 'The shelves are bare — set your epub folder to begin.', 'spine');
+
+  document.getElementById('lib-count').textContent =
+    books.length === 0 ? '' : `${books.length} volume${books.length===1?'':'s'}`;
+}
+
+/* ---------- scanning ---------- */
+async function scanLibrary(){
+  const statusEl = document.getElementById('lib-status');
+  const rescanBtn = document.getElementById('lib-rescan-btn');
+  rescanBtn.disabled = true;
+  try{
+    const res = await fetch('/api/library-scan');
+    const data = await res.json();
+    if(!data.configured){
+      statusEl.innerHTML = `No epub folder set yet — <a id="lib-status-set">choose one</a>.`;
+      document.getElementById('lib-status-set').addEventListener('click', openFolderModal);
+      books = []; booksById = {};
+      renderShelves();
+      return;
+    }
+    if(data.error){
+      statusEl.textContent = data.error + ' — check the folder path.';
+      books = []; booksById = {};
+      renderShelves();
+      return;
+    }
+    books = data.books || [];
+    booksById = {};
+    books.forEach(b => booksById[b.id] = b);
+    statusEl.textContent = '';
+    renderShelves();
+  }catch(e){
+    statusEl.textContent = "Couldn't reach the local server — is server.py running?";
+  }finally{
+    rescanBtn.disabled = false;
+  }
+}
+document.getElementById('lib-rescan-btn').addEventListener('click', scanLibrary);
+scanLibrary(); // no auto-refresh interval — a personal epub collection doesn't change on its own,
+                // and periodic rebuilds are exactly what causes pages to jump around underneath you
+
+/* ---------- book detail modal ---------- */
+let modalBookId = null;
+
+function openBookModal(id){
+  const book = booksById[id];
+  if(!book) return;
+  modalBookId = id;
+  document.getElementById('book-modal-title').textContent = book.title;
+  document.getElementById('book-modal-author').textContent = book.author || 'Unknown author';
+  document.getElementById('book-modal-filename').textContent = book.filename || '';
+
+  const coverEl = document.getElementById('book-modal-cover');
+  if(book.cover){
+    const img = document.createElement('img');
+    img.src = book.cover;
+    img.alt = '';
+    coverEl.replaceChildren(img);
+  }else{
+    coverEl.textContent = book.title;
+  }
+
+  const status = store.get('statuses', {})[id] || 'unread';
+  document.querySelectorAll('.status-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.status === status);
+  });
+
+  document.getElementById('book-modal-notes').value = store.get('notes', {})[id] || '';
+
+  document.getElementById('book-modal-backdrop').classList.remove('hidden');
+}
+function closeBookModal(){ document.getElementById('book-modal-backdrop').classList.add('hidden'); modalBookId = null; }
+document.getElementById('book-modal-close').addEventListener('click', closeBookModal);
+document.getElementById('book-modal-backdrop').addEventListener('click', e => {
+  if(e.target.id === 'book-modal-backdrop') closeBookModal();
+});
+
+document.querySelectorAll('.status-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(!modalBookId) return;
+    const statuses = store.get('statuses', {});
+    const newStatus = btn.dataset.status;
+    if(newStatus === 'unread') delete statuses[modalBookId];
+    else statuses[modalBookId] = newStatus;
+    store.set('statuses', statuses);
+    document.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b === btn));
+    renderShelves();
+  });
+});
+
+let notesTimer;
+document.getElementById('book-modal-notes').addEventListener('input', e => {
+  clearTimeout(notesTimer);
+  const id = modalBookId, val = e.target.value;
+  notesTimer = setTimeout(() => {
+    const notes = store.get('notes', {});
+    if(val.trim()) notes[id] = val; else delete notes[id];
+    store.set('notes', notes);
+  }, 500);
+});
+
+/* ---------- folder settings modal ---------- */
+function openFolderModal(){
+  document.getElementById('folder-error').textContent = '';
+  fetch('/api/library-config').then(r => r.json()).then(cfg => {
+    document.getElementById('folder-input').value = cfg.epub_folder || '';
+  }).catch(() => {});
+  document.getElementById('folder-modal-backdrop').classList.remove('hidden');
+  document.getElementById('folder-input').focus();
+}
+function closeFolderModal(){ document.getElementById('folder-modal-backdrop').classList.add('hidden'); }
+document.getElementById('lib-settings-btn').addEventListener('click', openFolderModal);
+document.getElementById('folder-modal-close').addEventListener('click', closeFolderModal);
+document.getElementById('folder-cancel').addEventListener('click', closeFolderModal);
+document.getElementById('folder-modal-backdrop').addEventListener('click', e => {
+  if(e.target.id === 'folder-modal-backdrop') closeFolderModal();
+});
+document.getElementById('folder-save').addEventListener('click', async () => {
+  const folder = document.getElementById('folder-input').value.trim();
+  const errEl = document.getElementById('folder-error');
+  if(!folder){ errEl.textContent = 'Enter a folder path.'; return; }
+  try{
+    const res = await fetch('/api/library-config', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({epub_folder: folder})
+    });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || 'save failed');
+    closeFolderModal();
+    scanLibrary();
+  }catch(e){
+    errEl.textContent = "Couldn't save — is server.py running?";
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ closeBookModal(); closeFolderModal(); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bluetooth Battery Panel — Session Notes (2026-07-20)</title>
+<style>
+  :root{
+    --bg:         #0f1117;
+    --surface:    #1a1d24;
+    --surface-2:  #22262f;
+    --border:     #2a2d36;
+    --text:       #e8eaf0;
+    --text-muted: #7b8099;
+    --accent:     #f59e0b;
+    --success:    #10b981;
+    --purple:     #a78bfa;
+    --danger:     #ef4444;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    max-width:780px;
+    margin:0 auto;
+    padding:48px 24px 80px;
+    line-height:1.6;
+  }
+  h1{font-size:24px;margin-bottom:4px;}
+  .subtitle{color:var(--text-muted);font-size:14px;margin-bottom:32px;}
+  h2{
+    color:var(--purple);
+    font-size:16px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin-top:40px;
+    margin-bottom:14px;
+    border-bottom:1px solid var(--border);
+    padding-bottom:8px;
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 20px;
+    margin-bottom:14px;
+  }
+  .card h3{margin:0 0 8px 0;font-size:14.5px;color:var(--text);}
+  .card p{margin:6px 0;color:var(--text-muted);font-size:13.5px;}
+  .badge{
+    display:inline-block;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.3px;
+    padding:3px 9px;
+    border-radius:20px;
+    margin-left:8px;
+    vertical-align:middle;
+  }
+  .badge.resolved{background:rgba(16,185,129,0.15);color:var(--success);}
+  .badge.paused{background:rgba(245,158,11,0.15);color:var(--accent);}
+  .badge.open{background:rgba(239,68,68,0.15);color:var(--danger);}
+  .badge.info{background:rgba(167,139,250,0.15);color:var(--purple);}
+  code{
+    background:var(--surface-2);
+    color:var(--accent);
+    padding:2px 6px;
+    border-radius:5px;
+    font-family:'SF Mono',Consolas,monospace;
+    font-size:12.5px;
+  }
+  pre{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    overflow-x:auto;
+    font-size:12.5px;
+    font-family:'SF Mono',Consolas,monospace;
+    color:var(--accent);
+    line-height:1.5;
+  }
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;color:var(--text-muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--border);}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);}
+  tr:last-child td{border-bottom:none;}
+  ul{margin:8px 0;padding-left:20px;}
+  li{margin:4px 0;font-size:13.5px;}
+  .timeline-item{display:flex;gap:14px;margin-bottom:2px;}
+  .timeline-item .num{
+    flex-shrink:0;width:22px;height:22px;border-radius:50%;
+    background:var(--surface-2);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;color:var(--text-muted);
+  }
+  .next-steps li{margin:8px 0;}
+  .next-steps li::marker{color:var(--accent);}
+  footer{margin-top:48px;color:var(--text-muted);font-size:12px;text-align:center;}
+</style>
+</head>
+<body>
+
+  <h1>Bluetooth Battery Panel — Session Notes</h1>
+  <div class="subtitle">2026-07-20 · projects/my-dashboard · picking back up tomorrow</div>
+
+  <h2>Where things stand right now</h2>
+  <div class="card">
+    <h3>Scheduled task <span class="badge paused">PAUSED</span></h3>
+    <p><code>MAGI Bluetooth Battery Check</code> is <strong>disabled</strong> (not deleted) via <code>schtasks /change /tn "MAGI Bluetooth Battery Check" /disable</code>. It will not run again until re-enabled.</p>
+  </div>
+  <div class="card">
+    <h3>Suspected cause of keyboard/mouse disconnects <span class="badge open">UNCONFIRMED</span></h3>
+    <p>Disconnects stopped immediately after disabling the task — strong circumstantial evidence it was the cause. But the Windows event log (<code>HidBth</code> provider, "went out of range or became unresponsive") showed <strong>zero</strong> matching entries in the window the disconnects were reported, so the exact mechanism isn't proven. Leading theory: querying the Bluetooth battery PnP property forces a live over-the-air read from the mouse/keyboard, which may not always surface as a logged "disconnect" event but still causes a brief hang.</p>
+  </div>
+  <div class="card">
+    <h3>Local server <span class="badge info">STILL RUNNING</span></h3>
+    <p><code>python.exe -m http.server 8420 --bind 127.0.0.1</code> is still up, serving the dashboard at <code>http://127.0.0.1:8420/dashboard.html</code>. <code>battery.json</code> will now go stale since the task that refreshes it is paused — the dashboard's Bluetooth panel will show the "background checker may not be running" warning, which is expected.</p>
+  </div>
+  <div class="card">
+    <h3>Shortcuts / hobbies data recovery <span class="badge open">UNCONFIRMED</span></h3>
+    <p>Walked through pulling <code>localStorage</code> from the still-open old <code>file://</code> tab and importing it into the <code>http://127.0.0.1:8420</code> tab via DevTools console. Never got final confirmation this worked — check tomorrow whether shortcuts/hobbies actually reappeared after the reload.</p>
+  </div>
+
+  <h2>What got built today</h2>
+  <ul>
+    <li>New "Bluetooth" panel on the dashboard showing live battery % for paired devices, with color thresholds: <strong style="color:var(--success)">green ≥40%</strong>, <strong style="color:var(--accent)">orange 16–39%</strong>, <strong style="color:var(--danger)">red ≤15%</strong>.</li>
+    <li><code>check-bluetooth-battery.ps1</code> — queries Windows' PnP device battery property, writes results to <code>battery.json</code>, and self-heals the local server if it's not running.</li>
+    <li>Custom device display names: <code>yz75pro5.0</code> → "YZ75 Pro Keyboard", <code>BT5.1 Mouse</code> → "Reddragon Taipan Max" (mapped in the script, not editable in Windows itself).</li>
+    <li>Switched the dashboard from a double-clicked <code>file://</code> page to a locally-served <code>http://127.0.0.1:8420</code> page — required because Chrome/Edge block local-file-to-local-file reads (<code>battery.json</code>) from <code>file://</code> pages.</li>
+    <li>Moved the Bluetooth panel to sit next to Calendar (previously Projects' spot); Projects moved to sit next to Notes.</li>
+  </ul>
+
+  <h2>Problems hit &amp; fixed along the way</h2>
+  <table>
+    <tr><th>Problem</th><th>Fix</th></tr>
+    <tr><td>XHR blocked reading <code>battery.json</code> from a <code>file://</code> page</td><td>Serve the dashboard over a local-only HTTP server instead</td></tr>
+    <tr><td><code>pythonw.exe</code> silently dropped every HTTP request</td><td>pythonw has no <code>stderr</code>; <code>http.server</code>'s request logging throws on it. Switched to <code>python.exe</code> + <code>-WindowStyle Hidden</code> (real stdout/stderr, just an invisible window)</td></tr>
+    <tr><td>"At log on" scheduled task trigger blocked by policy on this machine</td><td>Used a <code>/sc minute</code> repeating trigger instead (allowed), which also self-heals the server if it dies</td></tr>
+    <tr><td><code>localStorage</code> data (shortcuts, hobbies) "disappeared"</td><td>Turned out <code>file://</code> pages never durably wrote to disk in this Edge profile — not deletion, just fragile storage. Recovery attempted from the still-open original tab's live memory</td></tr>
+    <tr><td>Keyboard/mouse disconnecting, needing a click to "wake up"</td><td>Task disabled as an immediate mitigation; root-caused tomorrow (see next steps)</td></tr>
+  </table>
+
+  <h2>Next steps for tomorrow</h2>
+  <ul class="next-steps">
+    <li><strong>Confirm the data recovery worked</strong> — open <code>http://127.0.0.1:8420/dashboard.html</code> and check shortcuts/hobbies are back. If not, the old <code>file://</code> tab must still be open and unreloaded to retry.</li>
+    <li><strong>Investigate the disconnect mechanism properly</strong> before re-enabling anything: re-enable the task, watch closely, and note exact clock times of any input hang against the script's run times (every 2 min) to actually prove or rule out causation — today's event-log check came up empty, which isn't the same as "ruled out."</li>
+    <li><strong>Safer redesign option:</strong> stop querying the mouse/keyboard for battery entirely (only poll audio devices like the headphones), since those are non-critical to input and won't disrupt work if the query causes a hiccup. This sidesteps the risk regardless of root cause.</li>
+    <li><strong>Alternative:</strong> replace automatic polling with a manual "refresh" button on the dashboard, so battery is only queried when explicitly requested rather than every 2 minutes in the background.</li>
+    <li>Re-enable the task once one of the above is decided: <code>schtasks /change /tn "MAGI Bluetooth Battery Check" /enable</code></li>
+    <li>Still unresolved from earlier in the week: an unexplained "color scheme changed" report that never got reproduced or diagnosed. Low priority, but open.</li>
+  </ul>
+
+  <h2>Reference — file &amp; task locations</h2>
+  <div class="card">
+    <p><strong>Dashboard:</strong> <code>projects/my-dashboard/dashboard.html</code> — open via <code>http://127.0.0.1:8420/dashboard.html</code></p>
+    <p><strong>Battery checker script:</strong> <code>projects/my-dashboard/check-bluetooth-battery.ps1</code></p>
+    <p><strong>Battery data file:</strong> <code>projects/my-dashboard/battery.json</code></p>
+    <p><strong>Scheduled task:</strong> <code>MAGI Bluetooth Battery Check</code> — currently disabled</p>
+    <p><strong>Check task status:</strong> <code>schtasks /query /tn "MAGI Bluetooth Battery Check" /v /fo list</code></p>
+  </div>
+
+  <footer>Generated by MAGI · session notes for continuity, not a permanent doc</footer>
+
+</body>
+</html>

@@ -15,3 +15,12 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Personal iCloud calendar link (semi-private — public but unguessable)
+ical-config.json
+
+# Personal epub folder path (machine-specific, not meant to travel with the repo)
+library-config.json
+
+# Generated Bluetooth battery snapshot — runtime data, not source
+battery.json
