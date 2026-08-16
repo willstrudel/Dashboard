@@ -79,43 +79,70 @@
 
   /* ---------- topbar ---------- */
   .lib-topbar{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:30px;flex-wrap:wrap;gap:14px;
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;
+    margin-bottom:44px;
   }
-  .lib-back{
-    font-family:'Crimson Text',serif;font-size:14px;color:var(--text-dim);
-    text-decoration:none;border-bottom:1px solid transparent;
-  }
-  .lib-back:hover{color:var(--brass-light);border-color:var(--brass-light);}
   .lib-title{
-    font-family:'Playfair Display',serif;font-weight:800;font-size:30px;
+    font-family:'Playfair Display',serif;font-weight:800;font-size:38px;
     letter-spacing:1px;margin:0;color:var(--parchment);
     text-shadow:0 2px 8px rgba(0,0,0,0.5);
+    text-align:center;
   }
-  .lib-count{font-size:13px;color:var(--text-faint);letter-spacing:.5px;margin-top:4px;font-style:italic;}
-  .lib-controls{display:flex;align-items:center;gap:10px;font-family:'Crimson Text',serif;}
+  .lib-home{justify-self:start;}
+  .lib-controls{justify-self:end;display:flex;align-items:center;gap:10px;font-family:'Crimson Text',serif;}
   .lib-btn{
     background:linear-gradient(180deg, var(--navy-light), var(--navy));
     border:1px solid var(--navy-dark);color:var(--parchment);
     border-radius:5px;padding:7px 14px;font-size:13.5px;cursor:pointer;
-    font-family:'Crimson Text',serif;letter-spacing:.3px;
+    font-family:'Crimson Text',serif;letter-spacing:.3px;text-decoration:none;display:inline-block;
     box-shadow:0 2px 5px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
   }
   .lib-btn:hover{border-color:var(--brass);color:var(--brass-light);}
   .lib-btn:disabled{opacity:.55;cursor:default;}
 
+
   /* ---------- bookcases ---------- */
-  .case-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:40px;}
+  .case-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:56px;}
   .bookcase{margin:0 auto 40px;}
   .case-row .bookcase{margin-bottom:0;}
+
+  /* ---------- wall sconce above each plaque, with a warm light pool shining down ---------- */
+  .sconce{
+    position:relative;width:170px;height:24px;margin:0 auto 20px;z-index:2;
+  }
+  .sconce-bar{
+    position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;
+    background:linear-gradient(90deg, transparent, var(--brass-dark) 6%, var(--brass-light) 50%, var(--brass-dark) 94%, transparent);
+    border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.6);
+  }
+  .sconce-medallion{
+    position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--brass-light), var(--brass) 55%, var(--brass-dark) 100%);
+    box-shadow:0 2px 6px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.45);
+  }
+  .sconce::after{
+    /* the light pool itself — an elliptical warm glow spilling down the wall
+       from the fixture onto the plaque beneath it */
+    content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);
+    width:340px;height:100px;
+    background:radial-gradient(ellipse at 50% 0%, rgba(255,208,120,0.55), rgba(255,190,100,0.22) 45%, transparent 75%);
+    filter:blur(1px);
+    pointer-events:none;
+  }
   .plaque{
     width:max-content;margin:0 auto 12px;padding:7px 28px;
     background:linear-gradient(180deg, var(--brass-light), var(--brass) 55%, var(--brass-dark));
     border:1px solid #5f4711;border-radius:3px;
-    box-shadow:0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.5);
-    font-family:'Playfair Display',serif;font-weight:700;font-size:13px;
-    letter-spacing:3px;text-transform:uppercase;color:#2b1c05;
+    box-shadow:0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.5), 0 -10px 22px -6px rgba(255,205,120,0.4);
+    font-family:'Playfair Display',serif;font-weight:700;font-size:15px;
+    letter-spacing:2.5px;text-transform:uppercase;color:#1a1002;
     text-shadow:0 1px 0 rgba(255,255,255,0.35);
+  }
+  .plaque-collection{display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .lib-count{
+    font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:none;
+    color:#1a1002;text-shadow:0 1px 0 rgba(255,255,255,0.3);
   }
   .case-frame{
     background:
@@ -135,7 +162,7 @@
   .shelf{margin-bottom:16px;}
   .shelf-row{
     display:flex;align-items:flex-end;gap:5px;
-    min-height:184px;padding:0 8px 10px;overflow-x:auto;
+    min-height:184px;padding:0 8px 0;overflow-x:auto;
     background:linear-gradient(180deg, rgba(0,0,0,0.22), transparent 30%);
   }
   .shelf-board{
@@ -192,7 +219,7 @@
 
   /* ---------- shortcut settings / rescan status line ---------- */
   .lib-status{
-    text-align:center;color:var(--text-faint);font-size:12.5px;margin:-16px 0 30px;
+    text-align:center;color:var(--text-faint);font-size:12.5px;margin:0 0 46px;
     font-style:italic;
   }
   .lib-status a{color:var(--brass-light);cursor:pointer;text-decoration:underline;}
@@ -263,9 +290,12 @@
   }
   @media (max-width:700px){
     .wrap{padding:22px 14px;}
-    .lib-title{font-size:24px;}
+    .lib-title{font-size:30px;}
     .molding{height:26px;}
     .case-frame{padding:14px 8px 4px;border-width:7px;}
+    .lib-topbar{grid-template-columns:1fr;justify-items:center;gap:12px;}
+    .lib-home{justify-self:center;}
+    .lib-controls{justify-self:center;}
   }
 </style>
 </head>
@@ -274,11 +304,8 @@
 
 <div class="wrap">
   <div class="lib-topbar">
-    <div>
-      <a href="dashboard.html" class="lib-back">‹ Dashboard</a>
-      <h1 class="lib-title">Taygeta Library</h1>
-      <div class="lib-count" id="lib-count"></div>
-    </div>
+    <a href="dashboard.html" class="lib-btn lib-home">‹ Dashboard</a>
+    <h1 class="lib-title">Taygeta Library</h1>
     <div class="lib-controls">
       <button class="lib-btn" id="lib-settings-btn">Folder…</button>
       <button class="lib-btn" id="lib-rescan-btn">Rescan</button>
@@ -289,18 +316,24 @@
 
   <div class="case-row">
     <section class="bookcase">
+      <div class="sconce"><div class="sconce-bar"></div><div class="sconce-medallion"></div></div>
       <div class="plaque">Reading</div>
       <div class="case-frame"><div class="shelf" id="case-reading"></div></div>
     </section>
 
     <section class="bookcase">
+      <div class="sconce"><div class="sconce-bar"></div><div class="sconce-medallion"></div></div>
       <div class="plaque">Read</div>
       <div class="case-frame"><div class="shelf" id="case-read"></div></div>
     </section>
   </div>
 
   <section class="bookcase">
-    <div class="plaque">Collection <span style="font-size:10px;opacity:.75;">A&ndash;Z</span></div>
+    <div class="sconce"><div class="sconce-bar"></div><div class="sconce-medallion"></div></div>
+    <div class="plaque plaque-collection">
+      <div>Collection <span style="font-size:10px;opacity:.75;">A&ndash;Z</span></div>
+      <div class="lib-count" id="lib-count"></div>
+    </div>
     <div class="case-frame"><div class="shelf" id="case-collection"></div></div>
   </section>
 </div>
